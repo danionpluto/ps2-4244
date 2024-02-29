@@ -9,6 +9,7 @@ classes = []
 vocab = []
 sums = {}
 logs = {}
+ranks = {}
 with open(sys.argv[1], "r") as model:
       for line in model:
         split_line = line.strip().split()
@@ -21,8 +22,10 @@ with open(sys.argv[1], "r") as model:
         
         elif word not in vocab and word!="PRIOR":
             vocab.append(word)
-        
-        logs[(word,c)] = split_line[2]
+        if c not in ranks:
+            ranks[c] = {}
+        ranks[c][word] = split_line[2]
+        logs[(word,c)] = (float(split_line[2]))
 
 #print(logs)
 for c in classes:
@@ -42,10 +45,18 @@ for c in classes:
                     sums[c]+= a
 
             
+print(ranks["novel"]["great"])
 
-
-
-print(sums)        
+print("Class of test: " + max(sums))
+for c in ranks:
+    #print(c + ": "+str(sums[c]))
+    features = sorted(ranks[c])
+    #print(features)
+    i = 0
+    while i<15:
+        #print(c + " "+ str(i+1)+ " : "+ features[i] + " "+ ranks[c][features[i]])
+        i+=1
+      
 
 
   
