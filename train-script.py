@@ -59,6 +59,7 @@ for file in files:
         #print(split_line)
         #lines.append(l)
     i+=1
+#print(len(counts))
 #print("vocab\n")
 #print(len(vocab))
 #print(len(bd["novel"]))
@@ -110,9 +111,11 @@ for c in classes:
 #writing to np.params
 with open("nb.params", "w") as out_f:
     for c in logprior.keys():
-        out_f.write(c+" PRIOR : "+str(logprior[c])+"\n")
-        for w in bd[c]:
-           out_f.write(c+" "+w+" "+str(like[(w,c)])+"\n")
+        out_f.write(c+" PRIOR: "+str(logprior[c])+"\n")
+        for w in big_doc[c]:
+           if w in vocab:
+              out_f.write(c+" "+w+" "+str(like[(w,c)])+"\n")
+           
            
 
    
