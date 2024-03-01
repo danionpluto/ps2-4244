@@ -3,6 +3,8 @@ import math
 import re
 
 s = "/Users/danielaramos/Documents/GitHub/ps2-4244/stopwords.txt"
+
+#open and tokenize stopwords.txt
 stopwords = []
 with open(s, "r") as stop:
    for line in stop:
@@ -11,11 +13,10 @@ with open(s, "r") as stop:
         
         for word in split_line:
            stopwords.append(word)
-#print(stopwords)
 
+#open each training file and change class counts accordingly
 files = sys.argv[1:]
 big_doc = {}
-bd = {}
 lines = []
 counts = {}
 vocab = {}
@@ -30,8 +31,7 @@ for file in files:
        classes[c]+=1
     if c not in big_doc:
        big_doc[c] = {}
-    if c not in bd:
-       bd[c] = {}
+    
     
     #print("file "+str(i+1) + " "+c)
     with open(file, "r") as in_f:
@@ -42,34 +42,22 @@ for file in files:
         for word in split_line:
            if re.match('^[a-zA-Z0-9\-]+$', word) and word not in stopwords:
               l.append(word)
+              #add to the count of word in counts
               if word not in counts:
                  counts[word]=1
               else:
                  counts[word] +=1
+              #add to the count of the word in the speciific class the file falls under
               if word not in big_doc[c]:
                  big_doc[c][word] = 1
               else:
                  big_doc[c][word] +=1
+              # add word and its counts to dictionary vocab, if and only if its count is greater than or equal to 10
               if counts[word]>=10:
                  vocab[word] = counts[word]
-                 #if word not in bd[c]:
-                   # bd[c][word] = 0
-                # bd[c][word] = big_doc[c][word]  
-                
-        #print(split_line)
-        #lines.append(l)
+                 
     i+=1
-#print(len(counts))
-#print("vocab\n")
-#print(len(vocab))
-#print(len(bd["novel"]))
-#print(len(bd["info"]))
-#print(len(bd["soap"]))
-#print("bigdocs\n")
-#print(bd)
-#print(i)
-#print(classes)
-#972
+
 count = {}
 like = {}
 logprior = {}
@@ -77,17 +65,19 @@ sum = {}
 for c in classes:
    N_doc = i
    N_c = classes[c]
+   #calculate the class log prior
    logprior[c] = math.log2(N_c/N_doc)
+   #calculate the total counts of a word in a class
    sum[c] = 0
    for w in big_doc[c]:
       if w in vocab:
          sum[c]+=big_doc[c][w]
          
       
-   diff = len(vocab)-len(bd[c])
    
+   #add smoothing by adding length of the vocab
    sum[c]+=len(vocab)
-   #print(c + str(sum[c]))
+   #calculate and store the log liklehood for each word
    for w in vocab:
       if w in big_doc[c]:
          count[(w,c)] = big_doc[c][w] 
@@ -96,19 +86,7 @@ for c in classes:
          
       
       like[(w,c)] = math.log2((count[(w,c)] +1)/(sum[c]))
-# Testing      
-#print("bd")
-#print(big_doc["novel"]["passing"])
-#print("count")
-#print(count[("passing","novel")])
-#print(bd["novel"])
-#print("sum")
-#print(sum["novel"])
-#print(math.log2((count[("passing","novel")]+1)/(sum["novel"])))
-#print(like[("passing", "novel")])
-#print(logprior["novel"])
-
-#writing to np.params
+#write to np.params
 with open("nb.params", "w") as out_f:
     for c in logprior.keys():
         out_f.write(c+" PRIOR: "+str(logprior[c])+"\n")
