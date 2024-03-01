@@ -112,9 +112,8 @@ for c in classes:
 with open("nb.params", "w") as out_f:
     for c in logprior.keys():
         out_f.write(c+" PRIOR: "+str(logprior[c])+"\n")
-        for w in big_doc[c]:
-           if w in vocab:
-              out_f.write(c+" "+w+" "+str(like[(w,c)])+"\n")
+        for w in vocab:
+            out_f.write(c+" "+w+" "+str(like[(w,c)])+"\n")
            
            
 
